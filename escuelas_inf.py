@@ -33,7 +33,8 @@ def listar_escuelas_direccion(doc):
         localidades.append(escuela["address"]["locality"])
     filtro = [escuelas,calles,cps,localidades]
     return filtro
-#3. Cuenta cuantas de las escuelas infantiles tiene de servicios la "Educación de 0 a 3 años".
+
+#3. Cuenta cuantas de las escuelas infantiles tiene de servicios la "Educación de 0 a 3 años". Y las lista si el usuario lo indica.
 
 def cuenta_servicio(doc):
     escuelas = []
@@ -42,6 +43,32 @@ def cuenta_servicio(doc):
             escuelas.append(escuela["title"])
     return escuelas
 
+#4. Esta función recibe por teclado un servicio extra que pueda dar la escuela 
+#(Comedor, Horario ampliado, Educación de 0 a 3 años) y muestra el nombre de la escuela y dirección que tengan ese servicio.
+
+def filtrar_escuelas_servicios(doc,servicio):
+    escuelas = []
+    direcciones = []
+    for escuela in doc["@graph"]:
+        if servicio in escuela["organization"]["services"]:
+            escuelas.append(escuela["title"])
+            direcciones.append(escuela["address"]["street-address"])
+    filtro = [escuelas,direcciones]
+    return filtro
+
+#5. Esta función recibe un parámetro que es un código postal y muestra el nombre de la escuela y su dirección.
+
+def informacion_relacionada(doc,cp):
+    escuelas = []
+    direcciones = []
+    for escuela in doc["@graph"]:
+        if cp in escuela["address"]["postal-code"]:
+            escuelas.append(escuela["title"])
+            direcciones.append(escuela["address"]["street-address"])
+    filtro = [escuelas,direcciones]
+    return filtro
+
+#MENU
 while True:
     os.system('clear')
     print ()
@@ -73,6 +100,7 @@ while True:
         
         limpiar_pantalla_continuar()
 
+    #Muestra el numero total de escualas con el servicio de educacion de 0 a 3 años. Y lista las escuelas que son si el usuario lo pide.
     elif opcion == "3":
         print("Hay ",len(cuenta_servicio(doc))," escuelas con el servicio de Educación de 0 a 3 años.")
         respuesta = input("¿Quieres saber cuáles son? (S/N): ")
@@ -82,18 +110,63 @@ while True:
                 print(escuela)
             limpiar_pantalla_continuar()
         elif respuesta.upper() == "N":
+            print("Ok")
             limpiar_pantalla_continuar()
         else:
             print("Valor erróneo.")
             limpiar_pantalla_continuar()
 
-
+    #Muestra las escuelas y su direccion segun el tipo de servicios ofrecidos
     elif opcion == "4":
-        None
-        limpiar_pantalla_continuar()
+        print()
+        
+        servicios = []
+        for i in doc["@graph"]:
+            servicios.append(i["organization"]["services"])
+        print("Servicios extra registrados:")
+        print("-Comedor\n-Horario ampliado\n-Educación de 0 a 3 años")
+        print()
+        servicio = input("Introduce el servicio deseado:")
+        servicio = servicio.capitalize()
+        while servicio not in ('Comedor','Horario ampliado','Educación de 0 a 3 años'):
+            print("Servicio no registrádo ó no válido.")
+            print("\nServicios extra registrados:")
+            print("-Comedor\n-Horario ampliado\n-Educación de 0 a 3 años")
+            print()
+            servicio = input("\nIntroduce el servicio deseado:")
+            servicio = servicio.capitalize()
 
+        for escuela,direccion in zip (filtrar_escuelas_servicios(doc,servicio)[0],filtrar_escuelas_servicios(doc,servicio)[1]):
+            print("\nESCUELA: ",escuela,"\nDIRECCION: ",direccion)
+            
+        limpiar_pantalla_continuar()
+        
+    #Introduciendo un codigo postal muestra las escuelas que hay en ese municipio con su direccion.
     elif opcion == "5":
-        None
+        cps=[]
+        for i in doc["@graph"]:
+            cps.append(i["address"]["postal-code"])
+
+        cp = input("Introduce un codigo postal: ")
+        #validar cp
+        while cp not in cps:
+            print("Error. Codigo postal no válido.")
+            respuesta= input("¿Desea ver la lista de codigos postales?.(S/N)")
+            print()
+            if respuesta.upper() == "S":
+                for i in set(cps): 
+                    print(i)
+                cp = input("Introduce un codigo postal: ")
+                
+            elif respuesta.upper() == "N":
+                print("Ok")
+                cp = input("Introduce un codigo postal: ")
+            else:
+                print("Valor erróneo.")
+                continue
+
+        for escuela,direccion in zip (informacion_relacionada(doc,cp)[0],informacion_relacionada(doc,cp)[1]):
+            print("\nESCUELA: ",escuela,"\nDIRECCIÓN: ",direccion)
         limpiar_pantalla_continuar()
 
     elif opcion == "6":
