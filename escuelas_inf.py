@@ -67,6 +67,18 @@ def informacion_relacionada(doc,cp):
             direcciones.append(escuela["address"]["street-address"])
     filtro = [escuelas,direcciones]
     return filtro
+#6. La función recibe el nombre de la escuela infantil y muestra el nombre de la organización "organization-name"
+# y los servicios que ofrece.
+
+def libre(doc,nombre):
+    org = []
+    servicios = []
+    for escuela in doc["@graph"]:
+        if nombre in (escuela["title"]):
+            org.append(escuela["organization"]["organization-name"])
+            servicios.append(escuela["organization"]["services"])
+    filtro = [org,servicios]
+    return filtro
 
 #MENU
 while True:
@@ -96,7 +108,7 @@ while True:
     #Listar escuelas con direccion
     elif opcion == "2":
         for t,d,cp,loc in zip (listar_escuelas_direccion(doc)[0],listar_escuelas_direccion(doc)[1],listar_escuelas_direccion(doc)[2],listar_escuelas_direccion(doc)[3]):
-            print ("\nNOMBRE:",t,"\nDIRECCION:",d,"\nCP:",cp,"\nLOCALIDAD:",loc)
+            print ("\nNOMBRE:",t[27:],"\nDIRECCION:",d,"\nCP:",cp,"\nLOCALIDAD:",loc)
         
         limpiar_pantalla_continuar()
 
@@ -140,7 +152,7 @@ while True:
             print("\nESCUELA: ",escuela,"\nDIRECCION: ",direccion)
             
         limpiar_pantalla_continuar()
-        
+
     #Introduciendo un codigo postal muestra las escuelas que hay en ese municipio con su direccion.
     elif opcion == "5":
         cps=[]
@@ -170,9 +182,28 @@ while True:
         limpiar_pantalla_continuar()
 
     elif opcion == "6":
-        None
-        limpiar_pantalla_continuar()
+    # Introduce el nombre de la escuela y muestra el nombre de organizacion y servicios
+        
+        # Tambien le pregunta al usuario si quiere ver la lista de escuelas.
+        respuesta = input("¿Desea listar las escuelas? (S/N): ")
+        respuesta = respuesta.upper()
+        while respuesta.upper() not in ("S","N"):
+            print("Error. Introduce S o N")
+            respuesta = input("¿Desea listar las escuelas? (S/N): ")
+        if respuesta.upper() == "S":
+            print("LISTA DE ESCUELAS")
+            for escuela in listar_escuelas(doc):
+                print(escuela[27:])
+        else:
+            print("Ok.")
 
+        nombre = input("\nIntroduce el nombre de la escuela:")
+        
+        for org,serv in zip (libre(doc,nombre)[0],libre(doc,nombre)[1]):
+            print ("\nORGANIZACION: ",org,"\nSERVICIOS: ",serv)
+        limpiar_pantalla_continuar()
+    
+    #Salir del programa
     elif opcion == "exit":
         print("Programa terminado.")
         break
