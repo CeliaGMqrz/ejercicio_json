@@ -15,5 +15,5 @@ Programa en python que recoge información de un fichero json basado en el lista
 * **Libre:** La función recibe el nombre de la escuela infantil y muestra el nombre de la organización "organization-name" y los servicios que ofrece.
 
 **PROGRAMA PRINCIPAL**
-Este programa tendrá un menú en el que se podrá elegir qué queremos saber, cada opción llamará a la función correspondiente. El programa terminará cuando se introduzca un "*".
+Este programa tendrá un menú en el que se podrá elegir qué queremos saber, cada opción llamará a la función correspondiente. El programa terminará cuando se introduzca "exit".
 
